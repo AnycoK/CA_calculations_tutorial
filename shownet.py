@@ -20,6 +20,7 @@ saveloc = 'C:\\Users\\akulow\\Documents\\Python Scripts\\Modules\\CodedApertures
 pfad = 'M://Meins//Doktorarbeit//Coded Apertures//Experimental//19KW40//Rohdaten//'
 #pfad = 'M://Meins//Doktorarbeit//Coded Apertures//Experimental//20KW26//Rohdaten//20kw26_Oezlem//'
 #pfad = 'M://Meins//Doktorarbeit//Coded Apertures//Experimental//20KW26//Rohdaten//20kw26_Wouter//'
+pfad = './'
 #------------------------------------------------------------------------------
 def showdata(datei):
     datei_mit_endung = datei+'.h5'
