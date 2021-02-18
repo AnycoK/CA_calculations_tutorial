@@ -162,6 +162,7 @@ import tensorflow as tf
 #import scipy
 from scipy.ndimage.filters import gaussian_filter
 from scipy.sparse import coo_matrix
+from collections import Counter
 saveloc = 'C:\\Users\\akulow\\Documents\\Python Scripts\\Modules\\CodedApertures\\Bilder'
 
 #------------------------------------------------------------------------------
@@ -569,7 +570,7 @@ def buildob(h=60, w=60, starth=300, startw=300, picture='Hydrangeas', dim = 0):
         sys.exit()
     
     #os.chdir('M:\\Meins\\Doktorarbeit\\Coded Apertures\\Experimental\\19KW48\\Images')
-    os.chdir('C:\\Users\\akulow\\Documents\\Python Scripts\\Modules\\CodedApertures') #this is where the 
+    #os.chdir('C:\\Users\\akulow\\Documents\\Python Scripts\\Modules\\CodedApertures') #this is where the 
                                                        #pictures are located
     
     picname = picture+'.png'
@@ -1001,6 +1002,10 @@ def matf_sparse(detlength,sizedetpix,masksize,holesize,holepos,maskthick,
                     #else:
                     #    print(pixX, pixY)
                                           
+    #counter=Counter(indob)
+    #result = [list(counter.keys()),list(counter.values())]
+    #print(result[0])
+    #print(nofpix_ob)
     stf = coo_matrix((valu,(indob,inddet)),shape=[nofpix_ob,nofpix_det])
     if norm == 1:
         stf = stf*nholes/np.sum(stf)
@@ -1008,6 +1013,43 @@ def matf_sparse(detlength,sizedetpix,masksize,holesize,holepos,maskthick,
     t1 = time.time()
     print('computation time: ',t1-t0) 
     return(det2d,stf,pixYs)
+
+#------------------------------------------------------------------------------
+
+def matf_to_mstf(matf):
+    """
+
+    Parameters
+    ----------
+    matf : cac.matf_sparse, tuple containing the detector image (projection of 
+            uniformly illuminated object), the transferfunction (coo_matrix
+            containing the contribution of each object pixel in the field of 
+            view to each detector pixel, dimension: number of object pixels x 
+            number of detector pixels) and the pixYs (number of hits at the 
+            detector)
+        
+    DESCRIPTION.
+    Calculate a tensorflow sparse tensor from the matf[1]
+    Use this if you have calculated the matf_sparse instead of the 
+    buildmatf_for_reconstruction
+    The output of matf_to_mstf(matf_sparse) is the same as the output of 
+    buildmatf_for_reconstruction
+
+    Returns
+    -------
+    mstf, a sparse tensor containing the information of the transfer function.
+
+    """
+    mstf = matf[1]
+    mstf = mstf.astype('float32')
+    mstf = mstf.transpose()
+    indices = np.mat([mstf.row,mstf.col]).transpose()
+    datavalues = mstf.data.astype('float32')
+    mstf = tf.SparseTensor(indices,datavalues,mstf.shape)
+        
+    return(mstf)
+    
+
 #------------------------------------------------------------------------------
     
 def buildmatf_for_reconstruction(mask,detlength=264,detpixsize=48,masklength=1000,
@@ -1145,7 +1187,7 @@ def c_sparse(image,mstf,x0, tol=1e-100, max_iter=500, lr=0.5):
     for i in range(len(xs)):
         npbla = xs[i]
         xsarray[:,i:i+1] = npbla
-    plt.pyplot.plot(xsarray.transpose())
+    #plt.pyplot.plot(xsarray.transpose())
     t2 = time.time()
     dt = t2-t1
     print('time: ',dt,'seconds')
