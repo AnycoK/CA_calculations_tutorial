@@ -332,9 +332,9 @@ def makenmf(datei):
     W = model.fit_transform(n5arcs)
     H = model.components_
     
-    for i in range(n_comps):
-        w = np.reshape(W[:,i],(264,264))
-        plt.pyplot.matshow(w)
+   # for i in range(n_comps):
+   #     w = np.reshape(W[:,i],(264,264))
+   #    plt.pyplot.matshow(w)
     
     #extrahiere die interessanten Bilder    
     w1 = np.reshape(W[:,0],(264,264))
